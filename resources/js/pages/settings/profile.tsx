@@ -66,6 +66,25 @@ export default function Profile({
                             </div>
 
                             <div className="grid gap-2">
+                                <Label htmlFor="last_name">Last name</Label>
+
+                                <Input
+                                    id="last_name"
+                                    className="mt-1 block w-full"
+                                    defaultValue={auth.user.last_name}
+                                    name="last_name"
+                                    required
+                                    autoComplete="family-name"
+                                    placeholder="Last name"
+                                />
+
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.last_name}
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
 
                                 <Input
@@ -83,6 +102,78 @@ export default function Profile({
                                     className="mt-2"
                                     message={errors.email}
                                 />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="tel_num">Telephone number</Label>
+
+                                <Input
+                                    id="tel_num"
+                                    type="tel"
+                                    name="tel_num"
+                                    defaultValue={auth.user.tel_num ?? ''}
+                                    autoComplete="tel"
+                                    placeholder="Telephone number"
+                                />
+
+                                <InputError message={errors.tel_num} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="address">Address</Label>
+
+                                <Input
+                                    id="address"
+                                    type="text"
+                                    name="address"
+                                    defaultValue={auth.user.address ?? ''}
+                                    autoComplete="street-address"
+                                    placeholder="Address"
+                                />
+
+                                <InputError message={errors.address} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="about">About me</Label>
+
+                                <textarea
+                                    id="about"
+                                    name="about"
+                                    defaultValue={auth.user.about ?? ''}
+                                    maxLength={2000}
+                                    rows={4}
+                                    className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs outline-none focus-visible:ring-[3px] md:text-sm"
+                                    placeholder="Tell us about yourself..."
+                                />
+
+                                <InputError message={errors.about} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="image">Profile image</Label>
+
+                                <Input
+                                    id="image"
+                                    type="file"
+                                    name="image"
+                                    accept="image/jpeg,image/png,image/webp"
+                                />
+
+                                <InputError message={errors.image} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="cv">CV (PDF)</Label>
+
+                                <Input
+                                    id="cv"
+                                    type="file"
+                                    name="cv"
+                                    accept="application/pdf,.pdf"
+                                />
+
+                                <InputError message={errors.cv} />
                             </div>
 
                             {mustVerifyEmail &&

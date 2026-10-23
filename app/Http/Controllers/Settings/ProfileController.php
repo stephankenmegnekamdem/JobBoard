@@ -30,18 +30,39 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')
+                ->store('profile-images', 'public');
+        } else {
+                unset($validated['image']);
         }
 
-        $request->user()->save();
+        if ($request->hasFile('cv')) {
+            $validated['cv'] = $request->file('cv')
+                ->store('cvs', 'public');
+        } else {
+            unset($validated['cv']);
+        }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);
+        $user->fill($validated);
 
-        return to_route('profile.edit');
-    }
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            $user->save();
+
+            Inertia::flash('toast', [
+                'type' => 'success',
+                'message' => __('Profile updated.'),
+            ]);
+
+            return to_route('profile.edit');
+            }
 
     /**
      * Delete the user's profile.

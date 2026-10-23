@@ -17,16 +17,42 @@ trait ProfileValidationRules
     {
         return [
             'name' => $this->nameRules(),
+            'last_name' => $this->lastNameRules(),
             'email' => $this->emailRules($userId),
+            'tel_num' => ['nullable', 'string', 'max:30'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'about' => ['nullable', 'string', 'max:2000'],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,jpg,png,webp',
+                'max:2048',
+            ],
+            'cv' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:5120',
+            ],
         ];
     }
 
     /**
-     * Get the validation rules used to validate user names.
+     * Get the validation rules used to validate first names.
      *
      * @return array<int, ValidationRule|array<mixed>|string>
      */
     protected function nameRules(): array
+    {
+        return ['required', 'string', 'max:255'];
+    }
+
+    /**
+     * Get the validation rules used to validate last names.
+     *
+     * @return array<int, ValidationRule|array<mixed>|string>
+     */
+    protected function lastNameRules(): array
     {
         return ['required', 'string', 'max:255'];
     }
