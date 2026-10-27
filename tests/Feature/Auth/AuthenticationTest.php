@@ -46,7 +46,19 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard'));
+    $response->assertRedirect(route('home'));
+});
+
+test('admins are redirected to the admin page after login', function () {
+    $user = User::factory()->create(['is_admin' => true]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect('/admin');
 });
 
 test('passkey login response redirects to the current team dashboard', function () {
