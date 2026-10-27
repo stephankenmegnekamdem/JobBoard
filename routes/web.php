@@ -18,4 +18,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
 });
 
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::inertia('admin', 'admin/index')->name('admin.index');
+});
+
 require __DIR__.'/settings.php';
