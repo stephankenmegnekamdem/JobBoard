@@ -1,5 +1,10 @@
-<?php use App\Models\JobListing;
+<?php
+
+use App\Models\JobApplication;
+use App\Models\JobListing;
 use App\Models\User;
+use App\Notifications\ApplicationReceived;
+use Illuminate\Support\Facades\Notification;
 
 test('anyone can list published jobs', function () {
     JobListing::factory(15)->create();
@@ -31,4 +36,12 @@ test('a logged-in applicant is linked to their application', function () {
 test('an application needs an email and a message', function () {
     $job = JobListing::factory()->create();
     $this->postJson("/api/jobs/{$job->id}/applications", ['name' => 'X'])->assertUnprocessable()->assertJsonValidationErrors(['email', 'message']);
+});
+
+test('the job contact is emailed about a new application', function () {
+    Notification::fake();
+    $job = JobListing::factory()->create();
+    $this->postJson("/api/jobs/{$job->id}/applications", ['name' => 'Ada', 'email' => 'ada@example.com', 'message' => 'Hi'])->assertCreated();
+    Notification::assertSentTo($job->contact, ApplicationReceived::class);
+    expect(JobApplication::first()->emailed_at)->not->toBeNull();
 });
