@@ -43,7 +43,7 @@ return new class extends Migration
                 'image',
 
                 'cv',
-                
+
                 'about',
             ]);
         });

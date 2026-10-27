@@ -105,7 +105,9 @@ export default function Profile({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="tel_num">Telephone number</Label>
+                                <Label htmlFor="tel_num">
+                                    Telephone number
+                                </Label>
 
                                 <Input
                                     id="tel_num"
@@ -143,7 +145,7 @@ export default function Profile({
                                     defaultValue={auth.user.about ?? ''}
                                     maxLength={2000}
                                     rows={4}
-                                    className="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs outline-none focus-visible:ring-[3px] md:text-sm"
+                                    className="rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
                                     placeholder="Tell us about yourself..."
                                 />
 

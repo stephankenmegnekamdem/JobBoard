@@ -38,7 +38,7 @@ class ProfileController extends Controller
             $validated['image'] = $request->file('image')
                 ->store('profile-images', 'public');
         } else {
-                unset($validated['image']);
+            unset($validated['image']);
         }
 
         if ($request->hasFile('cv')) {
@@ -50,19 +50,19 @@ class ProfileController extends Controller
 
         $user->fill($validated);
 
-            if ($user->isDirty('email')) {
-                $user->email_verified_at = null;
-            }
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
 
-            $user->save();
+        $user->save();
 
-            Inertia::flash('toast', [
-                'type' => 'success',
-                'message' => __('Profile updated.'),
-            ]);
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Profile updated.'),
+        ]);
 
-            return to_route('profile.edit');
-            }
+        return to_route('profile.edit');
+    }
 
     /**
      * Delete the user's profile.

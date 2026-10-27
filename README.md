@@ -8,27 +8,27 @@ At the time of writing, the app contains only the starter kit itself. No job-boa
 
 ## Summary of choices
 
-| Area | Choice |
-|---|---|
-| Framework | Laravel 13 (`laravel/framework` ^13.17, locked at 13.38) |
-| PHP | 8.3 minimum; CI runs on 8.5 |
-| Starter kit | Laravel React starter kit |
-| Frontend | React 19 + TypeScript, served through Inertia.js 3 |
-| Build tool | Vite 8 via **Vite+** (`vite-plus`), with the React Compiler enabled |
-| Styling | Tailwind CSS 4 + shadcn/ui components (Radix primitives, "new-york" style, neutral base colour) |
-| Icons | Lucide |
-| Authentication | Laravel Fortify (headless auth backend), **not** Breeze or Jetstream |
-| Auth features enabled | Registration, password reset, email verification, two-factor auth (TOTP), passkeys (WebAuthn) |
-| Teams | Multi-tenant teams with Owner / Admin / Member roles and email invitations |
-| Database | SQLite (local file), also SQLite in-memory for tests |
-| Session / cache / queue | Database driver for all three |
-| Mail | `log` driver locally (emails are written to the log, not sent) |
-| Testing | Pest 5 |
-| Static analysis | Larastan (PHPStan) at level 7 |
-| Code style | Laravel Pint (Laravel preset) for PHP; Vite+ `check`/`fmt` for TypeScript |
-| Routes in JS | Laravel Wayfinder (type-safe route helpers generated into `resources/js/routes`) |
-| CI | GitHub Actions on push to `main` and on pull requests |
-| Dependabot | Weekly updates for GitHub Actions only |
+| Area                    | Choice                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| Framework               | Laravel 13 (`laravel/framework` ^13.17, locked at 13.38)                                        |
+| PHP                     | 8.3 minimum; CI runs on 8.5                                                                     |
+| Starter kit             | Laravel React starter kit                                                                       |
+| Frontend                | React 19 + TypeScript, served through Inertia.js 3                                              |
+| Build tool              | Vite 8 via **Vite+** (`vite-plus`), with the React Compiler enabled                             |
+| Styling                 | Tailwind CSS 4 + shadcn/ui components (Radix primitives, "new-york" style, neutral base colour) |
+| Icons                   | Lucide                                                                                          |
+| Authentication          | Laravel Fortify (headless auth backend), **not** Breeze or Jetstream                            |
+| Auth features enabled   | Registration, password reset, email verification, two-factor auth (TOTP), passkeys (WebAuthn)   |
+| Teams                   | Multi-tenant teams with Owner / Admin / Member roles and email invitations                      |
+| Database                | SQLite (local file), also SQLite in-memory for tests                                            |
+| Session / cache / queue | Database driver for all three                                                                   |
+| Mail                    | `log` driver locally (emails are written to the log, not sent)                                  |
+| Testing                 | Pest 5                                                                                          |
+| Static analysis         | Larastan (PHPStan) at level 7                                                                   |
+| Code style              | Laravel Pint (Laravel preset) for PHP; Vite+ `check`/`fmt` for TypeScript                       |
+| Routes in JS            | Laravel Wayfinder (type-safe route helpers generated into `resources/js/routes`)                |
+| CI                      | GitHub Actions on push to `main` and on pull requests                                           |
+| Dependabot              | Weekly updates for GitHub Actions only                                                          |
 
 ---
 
@@ -64,9 +64,9 @@ The starter kit's **teams** option was enabled. This adds:
 - `teams`, `team_members`, and `team_invitations` tables, plus a `current_team_id` column on `users`.
 - Every user gets a **personal team** on registration (`is_personal` flag).
 - Three roles defined in `app/Enums/TeamRole.php`:
-  - **Owner**: all permissions, cannot be reassigned.
-  - **Admin**: can update the team and create/cancel invitations.
-  - **Member**: no management permissions.
+    - **Owner**: all permissions, cannot be reassigned.
+    - **Admin**: can update the team and create/cancel invitations.
+    - **Member**: no management permissions.
 - **Email invitations** that expire after 3 days. A scheduled task (in `routes/console.php`) deletes expired invitations daily.
 - Team-scoped URLs: authenticated pages live under a `/{team-slug}/...` prefix (e.g. `/{team-slug}/dashboard`). The `EnsureTeamMembership` middleware checks the user belongs to that team and switches their "current team" to match the URL.
 - A team switcher and team settings pages in the sidebar.
@@ -127,15 +127,15 @@ Layouts are chosen automatically by page name in `resources/js/app.tsx`:
 
 ## Quality tooling
 
-| Tool | Command | What it does |
-|---|---|---|
-| Pint | `composer lint` / `composer lint:check` | Formats PHP (Laravel preset) |
-| Larastan | `composer types:check` | PHPStan at **level 7** over `app/`, `config/`, `database/`, `routes/` |
-| Pest | `php artisan test` | Feature tests run against an in-memory SQLite DB |
-| Vite+ lint | `npm run check` / `npm run check:fix` | Lints and formats TypeScript/TSX; warnings are treated as errors |
-| TypeScript | `npm run types:check` | `tsc --noEmit` |
-| Everything | `composer test` | Clears config, then runs Pint check, PHPStan, and Pest |
-| CI equivalent | `composer ci:check` | `npm run check` + `npm run types:check` + `composer test` |
+| Tool          | Command                                 | What it does                                                          |
+| ------------- | --------------------------------------- | --------------------------------------------------------------------- |
+| Pint          | `composer lint` / `composer lint:check` | Formats PHP (Laravel preset)                                          |
+| Larastan      | `composer types:check`                  | PHPStan at **level 7** over `app/`, `config/`, `database/`, `routes/` |
+| Pest          | `php artisan test`                      | Feature tests run against an in-memory SQLite DB                      |
+| Vite+ lint    | `npm run check` / `npm run check:fix`   | Lints and formats TypeScript/TSX; warnings are treated as errors      |
+| TypeScript    | `npm run types:check`                   | `tsc --noEmit`                                                        |
+| Everything    | `composer test`                         | Clears config, then runs Pint check, PHPStan, and Pest                |
+| CI equivalent | `composer ci:check`                     | `npm run check` + `npm run types:check` + `composer test`             |
 
 The starter kit's tests cover the whole auth flow (login, registration, verification, password reset, 2FA, password confirmation), profile and security settings, and teams (creation, members, invitations, expiry pruning).
 

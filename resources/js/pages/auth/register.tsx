@@ -57,13 +57,13 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                             <div className="grid gap-2">
                                 <Label htmlFor="last_name">Last name</Label>
                                 <Input
-                                id="last_name"
-                                type="text"
-                                required
-                                tabIndex={2}
-                                autoComplete="family-name"
-                                name="last_name"
-                                placeholder="Last name"
+                                    id="last_name"
+                                    type="text"
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="family-name"
+                                    name="last_name"
+                                    placeholder="Last name"
                                 />
                                 <InputError message={errors.last_name} />
                             </div>

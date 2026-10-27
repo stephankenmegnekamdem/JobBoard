@@ -26,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Membership> $memberships
  * @property-read Collection<int, User> $members
  */
-#[Fillable(['name', 'slug', 'is_personal'])]
+#[Fillable(['name', 'slug', 'is_personal', 'location', 'website', 'description'])]
 class Team extends Model
 {
     /** @use HasFactory<TeamFactory> */
@@ -113,5 +113,11 @@ class Team extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function jobListings(): HasMany
+    {
+        return $this->hasMany(JobListing::class);
+
     }
 }
