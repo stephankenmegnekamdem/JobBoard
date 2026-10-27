@@ -5,6 +5,7 @@ export type User = {
     name: string;
     last_name: string;
     email: string;
+    is_admin: boolean;
     tel_num: string | null;
     address: string | null;
     about: string | null;
