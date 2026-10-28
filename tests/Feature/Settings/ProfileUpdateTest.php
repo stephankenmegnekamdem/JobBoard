@@ -85,3 +85,28 @@ test('correct password must be provided to delete account', function () {
 
     expect($user->fresh())->not->toBeNull();
 });
+
+test('telephone, address and about can be updated', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->patch(route('profile.update'), [
+            'name' => 'Test User',
+            'last_name' => 'Example',
+            'email' => $user->email,
+            'tel_num' => '+905551234567',
+            'address' => 'Istanbul, Turkey',
+            'about' => 'Hello there.',
+        ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('profile.edit'));
+
+    $user->refresh();
+
+    expect($user->tel_num)->toBe('+905551234567');
+    expect($user->address)->toBe('Istanbul, Turkey');
+    expect($user->about)->toBe('Hello there.');
+});
