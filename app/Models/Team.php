@@ -19,12 +19,16 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $slug
  * @property bool $is_personal
+ * @property string|null $location
+ * @property string|null $website
+ * @property string|null $description
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read Collection<int, TeamInvitation> $invitations
  * @property-read Collection<int, Membership> $memberships
  * @property-read Collection<int, User> $members
+ * @property-read Collection<int, JobListing> $jobListings
  */
 #[Fillable(['name', 'slug', 'is_personal', 'location', 'website', 'description'])]
 class Team extends Model
@@ -33,7 +37,8 @@ class Team extends Model
     use GeneratesUniqueTeamSlugs, HasFactory, SoftDeletes;
 
     /**
-     * Bootstrap the model and its traits.
+     * The slug is generated once, when the team is created. Renaming a team
+     * does not change its slug, so existing URLs and invitation links keep working.
      */
     protected static function boot(): void
     {
@@ -44,18 +49,12 @@ class Team extends Model
                 $team->slug = static::generateUniqueTeamSlug($team->name);
             }
         });
-
-        static::updating(function (Team $team) {
-            if ($team->isDirty('name')) {
-                $team->slug = static::generateUniqueTeamSlug($team->name, $team->id);
-            }
-        });
     }
 
     /**
      * Get the team owner.
      */
-    public function owner(): ?Model
+    public function owner(): ?User
     {
         return $this->members()
             ->wherePivot('role', TeamRole::Owner->value)
@@ -63,8 +62,6 @@ class Team extends Model
     }
 
     /**
-     * Get all members of this team.
-     *
      * @return BelongsToMany<User, $this, Membership, 'pivot'>
      */
     public function members(): BelongsToMany
@@ -76,8 +73,6 @@ class Team extends Model
     }
 
     /**
-     * Get all memberships for this team.
-     *
      * @return HasMany<Membership, $this>
      */
     public function memberships(): HasMany
@@ -86,8 +81,6 @@ class Team extends Model
     }
 
     /**
-     * Get all invitations for this team.
-     *
      * @return HasMany<TeamInvitation, $this>
      */
     public function invitations(): HasMany
@@ -96,8 +89,14 @@ class Team extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
+     * @return HasMany<JobListing, $this>
+     */
+    public function jobListings(): HasMany
+    {
+        return $this->hasMany(JobListing::class);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -107,17 +106,8 @@ class Team extends Model
         ];
     }
 
-    /**
-     * Get the route key for the model.
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    public function jobListings(): HasMany
-    {
-        return $this->hasMany(JobListing::class);
-
     }
 }

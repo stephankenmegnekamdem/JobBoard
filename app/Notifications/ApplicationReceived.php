@@ -4,24 +4,25 @@ namespace App\Notifications;
 
 use App\Models\JobApplication;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ApplicationReceived extends Notification
+class ApplicationReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
-     * Create a new notification instance.
+     * Only the application id is stored on the queued job. The model is
+     * reloaded when the notification runs, so the job stays small and
+     * always reflects the current data.
      */
-    public function __construct(public JobApplication $application)
+    public function __construct(public int $applicationId)
     {
         //
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
@@ -29,26 +30,27 @@ class ApplicationReceived extends Notification
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
+        $application = JobApplication::with('jobListing')->findOrFail($this->applicationId);
+
         return (new MailMessage)
-            ->subject("New application: {$this->application->jobListing->title}")
-            ->line("{$this->application->name} ({$this->application->email}) applied.")
-            ->line($this->application->message);
+            ->subject(__('New application for :title', ['title' => $application->jobListing->title]))
+            ->line(__(':name (:email) applied for this job.', [
+                'name' => $application->name,
+                'email' => $application->email,
+            ]))
+            ->line(__('Message:'))
+            ->line($application->message);
     }
 
     /**
-     * Get the array representation of the notification.
-     *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'application_id' => $this->applicationId,
         ];
     }
 }

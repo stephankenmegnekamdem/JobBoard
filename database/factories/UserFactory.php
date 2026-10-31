@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountType;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
@@ -14,14 +15,9 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -31,6 +27,7 @@ class UserFactory extends Factory
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'account_type' => AccountType::Seeker,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
@@ -40,26 +37,36 @@ class UserFactory extends Factory
     }
 
     /**
-     * Configure the model factory.
+     * A company account that owns a company team.
      */
-    public function configure(): static
+    public function company(): static
     {
-        return $this->afterCreating(function ($user) {
-            $team = Team::factory()->personal()->create([
-                'name' => $user->name."'s Team",
-            ]);
+        return $this
+            ->state(fn (array $attributes) => ['account_type' => AccountType::Company])
+            ->afterCreating(function (User $user) {
+                $team = Team::factory()->create([
+                    'name' => $user->name."'s Company",
+                ]);
 
-            $team->members()->attach($user, [
-                'role' => TeamRole::Owner->value,
-            ]);
+                $team->members()->attach($user, [
+                    'role' => TeamRole::Owner->value,
+                ]);
 
-            $user->switchTeam($team);
-        });
+                $user->switchTeam($team);
+            });
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * A platform administrator. Set with forceFill, because is_admin is not
+     * mass-assignable, so it cannot be set through create() arguments.
      */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->forceFill(['is_admin' => true])->save();
+        });
+    }
+
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -67,9 +74,6 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the model has two-factor authentication configured.
-     */
     public function withTwoFactor(): static
     {
         return $this->state(fn (array $attributes) => [

@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class JobApplicationFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -22,9 +20,11 @@ class JobApplicationFactory extends Factory
             'job_listing_id' => JobListing::factory(),
             'user_id' => null,
             'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
+            'email' => fake()->unique()->safeEmail(),
             'tel_num' => fake()->phoneNumber(),
             'message' => fake()->paragraph(),
+            'status' => JobApplication::STATUS_NEW,
+            'emailed_at' => null,
         ];
     }
 }

@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TeamInvitationAlert from '@/components/team-invitation-alert';
@@ -16,7 +17,11 @@ type Props = {
     teamInvitation?: TeamInvitationContext | null;
 };
 
+type AccountType = 'seeker' | 'company';
+
 export default function Register({ passwordRules, teamInvitation }: Props) {
+    const [accountType, setAccountType] = useState<AccountType>('seeker');
+
     return (
         <>
             <Head title="Register" />
@@ -29,9 +34,78 @@ export default function Register({ passwordRules, teamInvitation }: Props) {
                 {({ processing, errors }) => (
                     <>
                         {teamInvitation && (
-                            <TeamInvitationAlert
-                                invitation={teamInvitation}
-                                action="Register"
+                            <>
+                                <TeamInvitationAlert
+                                    invitation={teamInvitation}
+                                    action="Register"
+                                />
+                                <input
+                                    type="hidden"
+                                    name="invitation"
+                                    value={teamInvitation.code}
+                                />
+                            </>
+                        )}
+
+                        {!teamInvitation && (
+                            <fieldset className="grid gap-2">
+                                <legend className="text-sm font-medium">
+                                    I am registering as
+                                </legend>
+                                <div className="flex gap-6">
+                                    <label className="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="radio"
+                                            name="account_type"
+                                            value="seeker"
+                                            checked={accountType === 'seeker'}
+                                            onChange={() =>
+                                                setAccountType('seeker')
+                                            }
+                                            data-test="account-type-seeker"
+                                        />
+                                        Job seeker
+                                    </label>
+                                    <label className="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="radio"
+                                            name="account_type"
+                                            value="company"
+                                            checked={accountType === 'company'}
+                                            onChange={() =>
+                                                setAccountType('company')
+                                            }
+                                            data-test="account-type-company"
+                                        />
+                                        Company
+                                    </label>
+                                </div>
+                                <InputError message={errors.account_type} />
+                            </fieldset>
+                        )}
+
+                        {!teamInvitation && accountType === 'company' && (
+                            <div className="grid gap-2">
+                                <Label htmlFor="company_name">
+                                    Company name
+                                </Label>
+                                <Input
+                                    id="company_name"
+                                    type="text"
+                                    required
+                                    name="company_name"
+                                    placeholder="Company name"
+                                    data-test="company-name-input"
+                                />
+                                <InputError message={errors.company_name} />
+                            </div>
+                        )}
+
+                        {teamInvitation && (
+                            <input
+                                type="hidden"
+                                name="account_type"
+                                value="seeker"
                             />
                         )}
 

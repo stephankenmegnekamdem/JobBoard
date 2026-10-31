@@ -1,9 +1,11 @@
 <?php
-
+use Laravel\Sanctum\Sanctum;
+use App\Enums\AccountType;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->admin = User::factory()->create(['is_admin' => true]);
+    $this->admin = User::factory()->create();
+    $this->admin->forceFill(['is_admin' => true])->save();
 });
 
 test('guests get 401', fn () => $this->getJson('/api/admin/users')->assertUnauthorized());
@@ -28,7 +30,10 @@ test('admins can create, update and delete a user', function () {
         'password' => 'password123',
     ])->assertCreated()->json('data.id');
 
-    expect(User::find($created)->personalTeam())->not->toBeNull();
+    $user = User::find($created);
+
+    expect($user->account_type)->toBe(AccountType::Seeker);
+    expect($user->teams()->count())->toBe(0);
 
     $this->actingAs($this->admin)->putJson("/api/admin/users/{$created}", [
         'name' => 'Grace M.',

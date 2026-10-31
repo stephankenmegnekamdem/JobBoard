@@ -2,35 +2,22 @@
 
 namespace App\Http\Middleware;
 
+use App\Data\UserTeam;
+use App\Models\User;
+use App\Support\HomeRoute;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
     /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
      * @return array<string, mixed>
      */
     public function share(Request $request): array
@@ -44,8 +31,22 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
+            // The single source of truth for "where is this user's home".
+            // Header, sidebar, and login all use this value.
+            'homeUrl' => fn () => $user ? HomeRoute::for($user) : '/',
+            'currentTeam' => fn () => $this->currentCompanyTeam($user),
             'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
         ];
+    }
+
+    private function currentCompanyTeam(?User $user): ?UserTeam
+    {
+        $team = $user?->currentTeam;
+
+        if (! $team || $team->is_personal || ! $user->belongsToTeam($team)) {
+            return null;
+        }
+
+        return $user->toUserTeam($team);
     }
 }

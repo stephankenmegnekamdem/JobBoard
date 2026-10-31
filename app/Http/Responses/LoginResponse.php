@@ -5,6 +5,7 @@ namespace App\Http\Responses;
 use Illuminate\Http\JsonResponse;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Symfony\Component\HttpFoundation\Response;
+use App\Support\HomeRoute;
 
 class LoginResponse implements LoginResponseContract
 {
@@ -12,6 +13,6 @@ class LoginResponse implements LoginResponseContract
     {
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 200)
-            : redirect()->intended($request->user()->is_admin ? '/admin' : '/');
+                : redirect()->intended(HomeRoute::for($request->user()));
     }
 }
