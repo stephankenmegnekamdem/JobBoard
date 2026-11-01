@@ -1,5 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    BriefcaseBusiness,
+    FolderGit2,
+    LayoutGrid,
+    Shield,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -23,12 +29,20 @@ export function AppSidebar() {
         ? dashboard(page.props.currentTeam.slug)
         : '/';
 
+    const isAdmin = page.props.auth.user.is_admin;
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
             href: dashboardUrl,
             icon: LayoutGrid,
         },
+        {
+            title: 'Job board',
+            href: '/',
+            icon: BriefcaseBusiness,
+        },
+        ...(isAdmin ? [{ title: 'Admin', href: '/admin', icon: Shield }] : []),
     ];
 
     const footerNavItems: NavItem[] = [
