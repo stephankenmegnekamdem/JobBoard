@@ -4,42 +4,48 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobListing;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 
 class JobListingController extends Controller
 {
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
         return JsonResource::collection(JobListing::latest()->paginate(15));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $job = JobListing::create([...$this->validated($request), 'published_at' => now()]);
 
         return response()->json(['data' => $job], 201);
     }
 
-    public function show(JobListing $job)
+    public function show(JobListing $job): JsonResponse
     {
-        return ['data' => $job->load(['company', 'contact'])];
+        return response()->json(['data' => $job->load(['company', 'contact'])]);
     }
 
-    public function update(Request $request, JobListing $job)
+    public function update(Request $request, JobListing $job): JsonResponse
     {
         $job->update($this->validated($request));
 
-        return ['data' => $job];
+        return response()->json(['data' => $job]);
     }
 
-    public function destroy(JobListing $job)
+    public function destroy(JobListing $job): Response
     {
         $job->delete();
 
         return response()->noContent();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function validated(Request $request): array
     {
         return $request->validate([
@@ -53,6 +59,7 @@ class JobListingController extends Controller
             'salary' => ['nullable', 'string', 'max:255'],
             'working_time' => ['nullable', 'string', 'max:255'],
             'link' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'string', 'max:255']]);
+            'image' => ['nullable', 'string', 'max:255'],
+        ]);
     }
 }

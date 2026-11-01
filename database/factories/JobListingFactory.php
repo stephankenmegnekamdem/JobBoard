@@ -25,7 +25,7 @@ class JobListingFactory extends Factory
             'title' => fake()->jobTitle(),
             'short_description' => fake()->sentence(12),
             'description' => fake()->paragraphs(3, true),
-            'keywords' => implode(',', fake()->words(4)),
+            'keywords' => fake()->words(4, asText: true),
             'location' => fake()->city(),
             'salary' => '$'.fake()->numberBetween(40, 120).'k',
             'working_time' => fake()->randomElement(['Full-time', 'Part-time', 'Internship']),

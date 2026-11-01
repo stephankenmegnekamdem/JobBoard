@@ -115,9 +115,13 @@ class Team extends Model
         return 'slug';
     }
 
+    /**
+     * Job listings posted by this company.
+     *
+     * @return HasMany<JobListing, $this>
+     */
     public function jobListings(): HasMany
     {
         return $this->hasMany(JobListing::class);
-
     }
 }
