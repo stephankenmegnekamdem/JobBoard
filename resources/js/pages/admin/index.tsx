@@ -1,7 +1,17 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import DataTable, { type ResourceConfig } from '@/components/admin/data-table';
+import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+
+type Props = {
+    stats: {
+        users: number;
+        companies: number;
+        openJobs: number;
+        newApplications: number;
+    };
+};
 
 const resources: ResourceConfig[] = [
     {
@@ -14,6 +24,7 @@ const resources: ResourceConfig[] = [
             'location',
             'salary',
             'working_time',
+            'expires_at',
         ],
         fields: [
             { name: 'team_id', label: 'Company ID', type: 'number' },
@@ -34,6 +45,11 @@ const resources: ResourceConfig[] = [
         columns: ['id', 'name', 'slug', 'is_personal', 'location', 'website'],
         fields: [
             { name: 'name', label: 'Name' },
+            {
+                name: 'owner_id',
+                label: 'Owner user ID (used when creating)',
+                type: 'number',
+            },
             { name: 'location', label: 'Location' },
             { name: 'website', label: 'Website' },
             { name: 'description', label: 'Description', type: 'textarea' },
@@ -42,7 +58,14 @@ const resources: ResourceConfig[] = [
     {
         title: 'Users',
         endpoint: '/api/admin/users',
-        columns: ['id', 'name', 'last_name', 'email', 'is_admin'],
+        columns: [
+            'id',
+            'name',
+            'last_name',
+            'email',
+            'account_type',
+            'is_admin',
+        ],
         fields: [
             { name: 'name', label: 'First name' },
             { name: 'last_name', label: 'Last name' },
@@ -53,12 +76,14 @@ const resources: ResourceConfig[] = [
                 type: 'password',
             },
             { name: 'tel_num', label: 'Phone' },
+            { name: 'address', label: 'Address' },
             { name: 'is_admin', label: 'Administrator', type: 'checkbox' },
         ],
     },
     {
         title: 'Applications',
         endpoint: '/api/admin/applications',
+        canCreate: false,
         columns: [
             'id',
             'job_listing_id',
@@ -68,11 +93,6 @@ const resources: ResourceConfig[] = [
             'created_at',
         ],
         fields: [
-            { name: 'job_listing_id', label: 'Job ID', type: 'number' },
-            { name: 'name', label: 'Name' },
-            { name: 'email', label: 'Email', type: 'email' },
-            { name: 'tel_num', label: 'Phone' },
-            { name: 'message', label: 'Message', type: 'textarea' },
             {
                 name: 'status',
                 label: 'Status (new, reviewed, rejected, hired)',
@@ -81,12 +101,49 @@ const resources: ResourceConfig[] = [
     },
 ];
 
-export default function AdminIndex() {
+export default function AdminIndex({ stats }: Props) {
     const [active, setActive] = useState(0);
 
+    const cards = [
+        { label: 'Users', value: stats.users },
+        { label: 'Companies', value: stats.companies },
+        { label: 'Open job listings', value: stats.openJobs },
+        { label: 'New applications', value: stats.newApplications },
+    ];
+
     return (
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-6 p-4">
             <Head title="Admin" />
+
+            <Heading
+                variant="small"
+                title="Platform overview"
+                description="Key numbers across the job board"
+            />
+
+            <div className="grid gap-4 md:grid-cols-4">
+                {cards.map((card) => (
+                    <div
+                        key={card.label}
+                        data-test="admin-stat"
+                        className="rounded-lg border p-4"
+                    >
+                        <div className="text-sm text-muted-foreground">
+                            {card.label}
+                        </div>
+                        <div className="text-2xl font-semibold">
+                            {card.value}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <Heading
+                variant="small"
+                title="Records"
+                description="List, create, edit and delete every table"
+            />
+
             <div className="flex flex-wrap gap-2">
                 {resources.map((resource, index) => (
                     <Button
@@ -98,6 +155,7 @@ export default function AdminIndex() {
                     </Button>
                 ))}
             </div>
+
             <DataTable
                 key={resources[active].endpoint}
                 config={resources[active]}

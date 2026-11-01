@@ -13,9 +13,6 @@ use Inertia\Inertia;
 
 class TeamMemberController extends Controller
 {
-    /**
-     * Update the specified team member's role.
-     */
     public function update(UpdateTeamMemberRequest $request, Team $team, User $user): RedirectResponse
     {
         Gate::authorize('updateMember', $team);
@@ -32,21 +29,24 @@ class TeamMemberController extends Controller
         return to_route('teams.edit', ['team' => $team->slug]);
     }
 
-    /**
-     * Remove the specified team member.
-     */
     public function destroy(Team $team, User $user): RedirectResponse
     {
         Gate::authorize('removeMember', $team);
 
         abort_if($team->owner()?->is($user), 403, __('The team owner cannot be removed.'));
 
+        // Check the database directly, so the result does not depend on how
+        // the attribute is typed in memory.
+        $wasCurrent = User::whereKey($user->id)
+            ->where('current_team_id', $team->id)
+            ->exists();
+
         $team->memberships()
             ->where('user_id', $user->id)
             ->delete();
 
-        if ($user->isCurrentTeam($team)) {
-            $user->switchTeam($user->personalTeam());
+        if ($wasCurrent) {
+            $user->switchToFallbackTeam($team);
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member removed.')]);

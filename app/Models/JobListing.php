@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\JobListingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $team_id
- * @property int $contact_id
+ * @property int|null $contact_id
  * @property string $title
  * @property string $short_description
  * @property string $description
@@ -28,11 +29,25 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $expires_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Team $company
- * @property-read User $contact
+ * @property-read Team|null $company
+ * @property-read User|null $contact
  * @property-read Collection<int, JobApplication> $applications
  */
-#[Fillable(['team_id', 'contact_id', 'title', 'short_description', 'description', 'keywords', 'location', 'salary', 'working_time', 'link', 'image', 'published_at', 'expires_at'])]
+#[Fillable([
+    'team_id',
+    'contact_id',
+    'title',
+    'short_description',
+    'description',
+    'keywords',
+    'location',
+    'salary',
+    'working_time',
+    'link',
+    'image',
+    'published_at',
+    'expires_at',
+])]
 class JobListing extends Model
 {
     /** @use HasFactory<JobListingFactory> */
@@ -49,13 +64,13 @@ class JobListing extends Model
     }
 
     /**
-     * The person in charge of this listing.
+     * The contact may be null if their account has been deleted.
      *
      * @return BelongsTo<User, $this>
      */
     public function contact(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'contact_id');
     }
 
     /**
@@ -67,10 +82,36 @@ class JobListing extends Model
     }
 
     /**
+     * Listings visible to the public: published, and not yet expired.
+     *
+     * @param  Builder<JobListing>  $query
+     * @return Builder<JobListing>
+     */
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->where(fn (Builder $query) => $query
+                ->whereNull('expires_at')
+                ->orWhere('expires_at', '>', now()));
+    }
+
+    public function isOpen(): bool
+    {
+        return $this->published_at !== null
+            && $this->published_at->lte(now())
+            && ($this->expires_at === null || $this->expires_at->gt(now()));
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
-        return ['published_at' => 'datetime', 'expires_at' => 'datetime'];
+        return [
+            'published_at' => 'datetime',
+            'expires_at' => 'datetime',
+        ];
     }
 }

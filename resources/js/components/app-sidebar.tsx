@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
-    BriefcaseBusiness,
+    Briefcase,
     FolderGit2,
     LayoutGrid,
     Shield,
@@ -20,29 +20,25 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
-    const page = usePage();
-    const dashboardUrl = page.props.currentTeam
-        ? dashboard(page.props.currentTeam.slug)
-        : '/';
-
-    const isAdmin = page.props.auth.user.is_admin;
+    const { homeUrl, auth } = usePage().props;
 
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
-            href: dashboardUrl,
+            href: homeUrl,
             icon: LayoutGrid,
         },
         {
             title: 'Job board',
             href: '/',
-            icon: BriefcaseBusiness,
+            icon: Briefcase,
         },
-        ...(isAdmin ? [{ title: 'Admin', href: '/admin', icon: Shield }] : []),
+        ...(auth.user.is_admin
+            ? [{ title: 'Admin', href: '/admin', icon: Shield }]
+            : []),
     ];
 
     const footerNavItems: NavItem[] = [
@@ -64,7 +60,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboardUrl} prefetch>
+                            <Link href={homeUrl} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

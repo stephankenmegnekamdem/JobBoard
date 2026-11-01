@@ -1,21 +1,19 @@
 export type User = {
     id: number;
 
-    // Personal information
     name: string;
     last_name: string;
     email: string;
     is_admin: boolean;
+    account_type: 'seeker' | 'company';
     tel_num: string | null;
     address: string | null;
     about: string | null;
 
-    // Uploaded file paths
     image: string | null;
+    avatar_url: string | null;
     cv: string | null;
 
-    // Existing properties
-    avatar?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;

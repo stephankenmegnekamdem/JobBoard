@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
+ * Status and emailed_at are deliberately not fillable. Status is set by
+ * the application code, and emailed_at is set only after a notification is sent.
+ *
  * @property int $id
  * @property int $job_listing_id
  * @property int|null $user_id
@@ -24,11 +27,39 @@ use Illuminate\Support\Carbon;
  * @property-read JobListing $jobListing
  * @property-read User|null $applicant
  */
-#[Fillable(['job_listing_id', 'user_id', 'name', 'email', 'tel_num', 'message', 'status', 'emailed_at'])]
+#[Fillable([
+    'job_listing_id',
+    'user_id',
+    'name',
+    'email',
+    'tel_num',
+    'message',
+])]
 class JobApplication extends Model
 {
     /** @use HasFactory<JobApplicationFactory> */
     use HasFactory;
+
+    public const STATUS_NEW = 'new';
+
+    public const STATUS_REVIEWED = 'reviewed';
+
+    public const STATUS_REJECTED = 'rejected';
+
+    public const STATUS_HIRED = 'hired';
+
+    /**
+     * @return array<int, string>
+     */
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_NEW,
+            self::STATUS_REVIEWED,
+            self::STATUS_REJECTED,
+            self::STATUS_HIRED,
+        ];
+    }
 
     /**
      * @return BelongsTo<JobListing, $this>
@@ -53,6 +84,8 @@ class JobApplication extends Model
      */
     protected function casts(): array
     {
-        return ['emailed_at' => 'datetime'];
+        return [
+            'emailed_at' => 'datetime',
+        ];
     }
 }

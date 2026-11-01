@@ -4,7 +4,6 @@ import { useState } from 'react';
 import CreateTeamModal from '@/components/create-team-modal';
 import Heading from '@/components/heading';
 import LeaveTeamModal from '@/components/leave-team-modal';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -51,8 +50,7 @@ export default function TeamsIndex({ teams }: Props) {
 
                 <div className="space-y-3">
                     {teams.map((team) => {
-                        const canLeaveTeam =
-                            !team.isPersonal && team.role !== 'owner';
+                        const canLeaveTeam = team.role !== 'owner';
 
                         return (
                             <div
@@ -62,19 +60,12 @@ export default function TeamsIndex({ teams }: Props) {
                             >
                                 <div className="flex items-center gap-4">
                                     <div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-medium">
-                                                {team.name}
-                                            </span>
-                                            {team.isPersonal ? (
-                                                <Badge variant="secondary">
-                                                    Personal
-                                                </Badge>
-                                            ) : null}
-                                        </div>
-                                        <span className="text-sm text-muted-foreground">
-                                            {team.roleLabel}
+                                        <span className="font-medium">
+                                            {team.name}
                                         </span>
+                                        <div className="text-sm text-muted-foreground">
+                                            {team.roleLabel}
+                                        </div>
                                     </div>
                                 </div>
 

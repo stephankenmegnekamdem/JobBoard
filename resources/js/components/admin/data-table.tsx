@@ -15,6 +15,8 @@ export type ResourceConfig = {
     endpoint: string;
     columns: string[];
     fields: Field[];
+    /** Some resources (applications) can only be created by the public form. */
+    canCreate?: boolean;
 };
 
 type Row = Record<string, unknown> & { id: number };
@@ -92,7 +94,9 @@ export default function DataTable({ config }: { config: ResourceConfig }) {
                 <h2 className="text-lg font-semibold">
                     {config.title} {result && `(${result.meta.total})`}
                 </h2>
-                <Button onClick={() => setEditing('new')}>New</Button>
+                {config.canCreate !== false && (
+                    <Button onClick={() => setEditing('new')}>New</Button>
+                )}
             </div>
 
             {editing && (

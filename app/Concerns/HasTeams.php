@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\URL;
 trait HasTeams
 {
     /**
-     * Get all of the teams the user belongs to.
+     * Get all of the teams the user belongs to, including legacy personal teams.
      *
      * @return BelongsToMany<Team, $this>
      */
@@ -27,6 +27,16 @@ trait HasTeams
         return $this->belongsToMany(Team::class, 'team_members', 'user_id', 'team_id')
             ->withPivot(['role'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the company teams the user belongs to. Legacy personal teams are excluded.
+     *
+     * @return BelongsToMany<Team, $this>
+     */
+    public function companyTeams(): BelongsToMany
+    {
+        return $this->teams()->where('teams.is_personal', false);
     }
 
     /**
@@ -67,16 +77,6 @@ trait HasTeams
     }
 
     /**
-     * Get the user's personal team.
-     */
-    public function personalTeam(): ?Team
-    {
-        return $this->ownedTeams()
-            ->where('teams.is_personal', true)
-            ->first();
-    }
-
-    /**
      * Switch to the given team.
      */
     public function switchTeam(Team $team): bool
@@ -91,6 +91,23 @@ trait HasTeams
         URL::defaults(['current_team' => $team->slug]);
 
         return true;
+    }
+
+    /**
+     * Switch to the first remaining company team, or clear the current team if none remain.
+     */
+    public function switchToFallbackTeam(?Team $excluding = null): void
+    {
+        $team = $this->fallbackTeam($excluding);
+
+        if ($team) {
+            $this->switchTeam($team);
+
+            return;
+        }
+
+        $this->update(['current_team_id' => null]);
+        $this->setRelation('currentTeam', null);
     }
 
     /**
@@ -129,13 +146,13 @@ trait HasTeams
     }
 
     /**
-     * Get the user's teams as a collection of UserTeam objects.
+     * Get the user's company teams as UserTeam objects.
      *
      * @return Collection<int, UserTeam>
      */
     public function toUserTeams(bool $includeCurrent = false): Collection
     {
-        return $this->teams()
+        return $this->companyTeams()
             ->get()
             ->map(fn (Team $team) => ! $includeCurrent && $this->isCurrentTeam($team) ? null : $this->toUserTeam($team))
             ->filter()
@@ -143,7 +160,7 @@ trait HasTeams
     }
 
     /**
-     * Get the user's team as a UserTeam object.
+     * Get a team as a UserTeam object.
      */
     public function toUserTeam(Team $team): UserTeam
     {
@@ -153,7 +170,6 @@ trait HasTeams
             id: $team->id,
             name: $team->name,
             slug: $team->slug,
-            isPersonal: $team->is_personal,
             role: $role?->value,
             roleLabel: $role?->label(),
             isCurrent: $this->isCurrentTeam($team),
@@ -178,9 +194,12 @@ trait HasTeams
         );
     }
 
+    /**
+     * Get the first company team, alphabetically, excluding the given team.
+     */
     public function fallbackTeam(?Team $excluding = null): ?Team
     {
-        return $this->teams()
+        return $this->companyTeams()
             ->when($excluding, fn ($query) => $query->where('teams.id', '!=', $excluding->id))
             ->orderByRaw('LOWER(teams.name)')
             ->first();

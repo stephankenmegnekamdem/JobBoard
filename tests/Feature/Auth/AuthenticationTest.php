@@ -1,5 +1,6 @@
-<?php
+<<?php
 
+use App\Enums\AccountType;
 use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -37,8 +38,8 @@ test('login screen includes team invitation context', function () {
     );
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('seekers are redirected to applications after login', function () {
+    $user = User::factory()->create(['account_type' => AccountType::Seeker]);
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
@@ -46,11 +47,25 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('home'));
+    $response->assertRedirect('/applications');
+});
+
+test('companies are redirected to their team dashboard after login', function () {
+    $user = User::factory()->create(['account_type' => AccountType::Company]);
+    $team = Team::factory()->create(['name' => 'Acme Ltd']);
+    $team->members()->attach($user, ['role' => TeamRole::Owner->value]);
+
+    $response = $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect("/{$team->slug}/dashboard");
 });
 
 test('admins are redirected to the admin page after login', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+    $user = User::factory()->admin()->create();
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
@@ -61,8 +76,8 @@ test('admins are redirected to the admin page after login', function () {
     $response->assertRedirect('/admin');
 });
 
-test('passkey login response redirects to the current team dashboard', function () {
-    $user = User::factory()->create();
+test('passkey login response redirects seekers to applications', function () {
+    $user = User::factory()->create(['account_type' => AccountType::Seeker]);
 
     $request = Request::create(route('login', absolute: false), 'GET', server: [
         'HTTP_ACCEPT' => 'application/json',
@@ -72,7 +87,23 @@ test('passkey login response redirects to the current team dashboard', function 
 
     $jsonResponse = app(PasskeyLoginResponse::class)->toResponse($request);
 
-    expect($jsonResponse->getData()->redirect)->toBe(route('dashboard', ['current_team' => $user->personalTeam()->slug]));
+    expect($jsonResponse->getData()->redirect)->toBe(url('/applications'));
+});
+
+test('passkey login response redirects companies to their team dashboard', function () {
+    $user = User::factory()->create(['account_type' => AccountType::Company]);
+    $team = Team::factory()->create(['name' => 'Passkey Co']);
+    $team->members()->attach($user, ['role' => TeamRole::Owner->value]);
+
+    $request = Request::create(route('login', absolute: false), 'GET', server: [
+        'HTTP_ACCEPT' => 'application/json',
+    ]);
+    $request->setLaravelSession($this->app['session.store']);
+    $request->setUserResolver(fn () => $user);
+
+    $jsonResponse = app(PasskeyLoginResponse::class)->toResponse($request);
+
+    expect($jsonResponse->getData()->redirect)->toBe(url("/{$team->slug}/dashboard"));
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {

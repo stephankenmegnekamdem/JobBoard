@@ -4,36 +4,50 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobListing;
+use App\Models\Team;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 class JobListingController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResource
     {
-        return JsonResource::collection(JobListing::latest()->paginate(15));
+        return JsonResource::collection(
+            JobListing::with(['company', 'contact'])->latest()->paginate(15),
+        );
     }
 
     public function store(Request $request): JsonResponse
     {
-        $job = JobListing::create([...$this->validated($request), 'published_at' => now()]);
+        $data = $this->validated($request);
+
+        $job = JobListing::create([
+            ...$data,
+            'published_at' => now(),
+        ]);
 
         return response()->json(['data' => $job], 201);
     }
 
-    public function show(JobListing $job): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    public function show(JobListing $job): array
     {
-        return response()->json(['data' => $job->load(['company', 'contact'])]);
+        return ['data' => $job->load(['company', 'contact'])];
     }
 
-    public function update(Request $request, JobListing $job): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    public function update(Request $request, JobListing $job): array
     {
         $job->update($this->validated($request));
 
-        return response()->json(['data' => $job]);
+        return ['data' => $job];
     }
 
     public function destroy(JobListing $job): Response
@@ -48,9 +62,9 @@ class JobListingController extends Controller
      */
     private function validated(Request $request): array
     {
-        return $request->validate([
-            'team_id' => ['required', 'exists:teams,id'],
-            'contact_id' => ['required', 'exists:users,id'],
+        $data = $request->validate([
+            'team_id' => ['required', 'integer', Rule::exists('teams', 'id')->whereNull('deleted_at')],
+            'contact_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'title' => ['required', 'string', 'max:255'],
             'short_description' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
@@ -60,6 +74,20 @@ class JobListingController extends Controller
             'working_time' => ['nullable', 'string', 'max:255'],
             'link' => ['nullable', 'url', 'max:255'],
             'image' => ['nullable', 'string', 'max:255'],
+            'expires_at' => ['nullable', 'date', 'after:now'],
         ]);
+
+        $isMember = Team::query()
+            ->whereKey($data['team_id'])
+            ->whereHas('members', fn ($query) => $query->where('users.id', $data['contact_id']))
+            ->exists();
+
+        abort_unless(
+            $isMember,
+            422,
+            'The contact must be a member of the company.',
+        );
+
+        return $data;
     }
 }

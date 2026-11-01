@@ -4,36 +4,43 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 class JobApplicationController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResource
     {
-        return JsonResource::collection(JobApplication::with('jobListing')->latest()->paginate(15));
+        return JsonResource::collection(
+            JobApplication::with(['jobListing', 'applicant'])->latest()->paginate(15),
+        );
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    public function show(JobApplication $application): array
     {
-        $application = JobApplication::create($this->validated($request));
-
-        return response()->json(['data' => $application], 201);
+        return ['data' => $application->load(['jobListing', 'applicant'])];
     }
 
-    public function show(JobApplication $application): JsonResponse
+    /**
+     * Only the status can change. Status is not mass-assignable, so it is
+     * set explicitly, and the job, applicant, and message are never touched.
+     *
+     * @return array<string, mixed>
+     */
+    public function update(Request $request, JobApplication $application): array
     {
-        return response()->json(['data' => $application->load(['jobListing', 'applicant'])]);
-    }
+        $data = $request->validate([
+            'status' => ['required', 'string', Rule::in(JobApplication::statuses())],
+        ]);
 
-    public function update(Request $request, JobApplication $application): JsonResponse
-    {
-        $application->update($this->validated($request));
+        $application->forceFill(['status' => $data['status']])->save();
 
-        return response()->json(['data' => $application]);
+        return ['data' => $application];
     }
 
     public function destroy(JobApplication $application): Response
@@ -41,20 +48,5 @@ class JobApplicationController extends Controller
         $application->delete();
 
         return response()->noContent();
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function validated(Request $request): array
-    {
-        return $request->validate([
-            'job_listing_id' => ['required', 'exists:job_listings,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'tel_num' => ['nullable', 'string', 'max:30'],
-            'message' => ['required', 'string', 'max:5000'],
-            'status' => ['required', 'in:new,reviewed,rejected,hired'],
-        ]);
     }
 }

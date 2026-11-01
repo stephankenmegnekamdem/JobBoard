@@ -14,9 +14,6 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile settings page.
-     */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/profile', [
@@ -25,9 +22,6 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -64,12 +58,19 @@ class ProfileController extends Controller
         return to_route('profile.edit');
     }
 
-    /**
-     * Delete the user's profile.
-     */
     public function destroy(ProfileDeleteRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        $ownsCompany = $user->ownedTeams()
+            ->where('teams.is_personal', false)
+            ->exists();
+
+        if ($ownsCompany) {
+            return back()->withErrors([
+                'password' => __('Transfer ownership of your company or delete it before deleting your account.'),
+            ]);
+        }
 
         Auth::logout();
 

@@ -12,8 +12,10 @@ test('non-admins cannot open the admin page', function () {
 });
 
 test('admins can open the admin page', function () {
-    $this->actingAs(User::factory()->create(['is_admin' => true]))
+    $this->actingAs(User::factory()->admin()->create())
         ->get('/admin')
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('admin/index'));
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/index')
+            ->has('stats'));
 });
