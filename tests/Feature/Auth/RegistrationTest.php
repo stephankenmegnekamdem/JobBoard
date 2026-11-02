@@ -56,7 +56,7 @@ test('seekers can register without a team', function () {
     expect($user->account_type)->toBe(AccountType::Seeker);
     expect($user->teams()->count())->toBe(0);
 
-    $response->assertRedirect('/applications');
+    $response->assertRedirect('/');
 });
 
 test('companies register with a company team they own', function () {

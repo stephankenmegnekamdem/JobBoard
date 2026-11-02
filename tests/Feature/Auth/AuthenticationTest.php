@@ -38,7 +38,7 @@ test('login screen includes team invitation context', function () {
     );
 });
 
-test('seekers are redirected to applications after login', function () {
+test('seekers are redirected to the job board after login', function () {
     $user = User::factory()->create(['account_type' => AccountType::Seeker]);
 
     $response = $this->post(route('login.store'), [
@@ -47,7 +47,7 @@ test('seekers are redirected to applications after login', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect('/applications');
+    $response->assertRedirect('/');
 });
 
 test('companies are redirected to their team dashboard after login', function () {
@@ -76,7 +76,7 @@ test('admins are redirected to the admin page after login', function () {
     $response->assertRedirect('/admin');
 });
 
-test('passkey login response redirects seekers to applications', function () {
+test('passkey login response redirects seekers to the job board', function () {
     $user = User::factory()->create(['account_type' => AccountType::Seeker]);
 
     $request = Request::create(route('login', absolute: false), 'GET', server: [
@@ -87,7 +87,7 @@ test('passkey login response redirects seekers to applications', function () {
 
     $jsonResponse = app(PasskeyLoginResponse::class)->toResponse($request);
 
-    expect($jsonResponse->getData()->redirect)->toBe(url('/applications'));
+    expect($jsonResponse->getData()->redirect)->toBe(url('/'));
 });
 
 test('passkey login response redirects companies to their team dashboard', function () {

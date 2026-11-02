@@ -43,7 +43,7 @@ test('the shared home url matches each account type', function () {
         ->assertInertia(fn (Assert $page) => $page->where('homeUrl', '/admin'));
 
     $this->actingAs($seeker)->get('/applications')
-        ->assertInertia(fn (Assert $page) => $page->where('homeUrl', '/applications'));
+        ->assertInertia(fn (Assert $page) => $page->where('homeUrl', '/'));
 
     $this->actingAs($company)->get('/applications')
         ->assertInertia(fn (Assert $page) => $page->where(

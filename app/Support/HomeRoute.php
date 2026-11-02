@@ -9,7 +9,7 @@ final class HomeRoute
 {
     public const ADMIN = '/admin';
 
-    public const SEEKER = '/applications';
+    public const SEEKER = '/';
 
     public static function for(User $user): string
     {

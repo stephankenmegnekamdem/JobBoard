@@ -38,7 +38,7 @@ test('email can be verified', function () {
 
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    $response->assertRedirect('/applications?verified=1');
+    $response->assertRedirect('/?verified=1');
 });
 
 test('companies are redirected to their team dashboard after verifying email', function () {
@@ -114,7 +114,7 @@ test('already verified user visiting verification link is redirected without fir
     );
 
     $this->actingAs($user)->get($verificationUrl)
-        ->assertRedirect('/applications?verified=1');
+        ->assertRedirect('/?verified=1');
 
     Event::assertNotDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();

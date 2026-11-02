@@ -213,7 +213,7 @@ test('team invitations can be declined by the invited user', function () {
         ->actingAs($invitedUser)
         ->delete(route('invitations.decline', $invitation));
 
-    $response->assertRedirect('/applications');
+    $response->assertRedirect('/');
 
     $this->assertDatabaseMissing('team_invitations', [
         'id' => $invitation->id,
