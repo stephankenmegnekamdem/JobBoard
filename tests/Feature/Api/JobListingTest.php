@@ -45,3 +45,15 @@ test('the job contact is emailed about a new application', function () {
     Notification::assertSentTo($job->contact, ApplicationReceived::class);
     expect(JobApplication::first()->emailed_at)->not->toBeNull();
 });
+
+test('admins cannot apply to jobs', function () {
+    $job = JobListing::factory()->create();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->postJson("/api/jobs/{$job->id}/applications", [
+            'name' => 'Admin', 'email' => 'admin@example.com', 'message' => 'Hi',
+        ])
+        ->assertForbidden();
+
+    $this->assertDatabaseCount('job_applications', 0);
+});

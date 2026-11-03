@@ -18,7 +18,8 @@ class StoreJobApplicationRequest extends FormRequest
     {
         $this->job();
 
-        return true;
+        // Admins manage the board; they do not apply to jobs on it.
+        return ! $this->user('sanctum')?->is_admin;
     }
 
     protected function prepareForValidation(): void

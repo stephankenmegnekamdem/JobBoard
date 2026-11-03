@@ -1,11 +1,15 @@
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import ApplyForm from '@/components/jobs/apply-form';
 import JobDetails from '@/components/jobs/job-details';
 import { Button } from '@/components/ui/button';
 import { apiFetch } from '@/lib/api';
+import type { User } from '@/types';
 import type { Job, JobDetail } from '@/types/jobs';
 
 export default function JobCard({ job }: { job: Job }) {
+    const user = usePage().props.auth.user as User | null;
+    const canApply = !user?.is_admin;
     const [detail, setDetail] = useState<JobDetail | null>(null);
     const [showDetail, setShowDetail] = useState(false);
     const [showApply, setShowApply] = useState(false);
@@ -36,9 +40,14 @@ export default function JobCard({ job }: { job: Job }) {
                 >
                     {showDetail ? 'Show less' : 'Learn more'}
                 </Button>
-                <Button size="sm" onClick={() => setShowApply((open) => !open)}>
-                    Apply
-                </Button>
+                {canApply && (
+                    <Button
+                        size="sm"
+                        onClick={() => setShowApply((open) => !open)}
+                    >
+                        Apply
+                    </Button>
+                )}
             </div>
             {showDetail && detail && <JobDetails job={detail} />}
             {showApply && <ApplyForm jobId={job.id} />}
