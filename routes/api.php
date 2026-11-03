@@ -41,8 +41,5 @@ Route::prefix('admin')
 
         Route::apiResource('users', AdminUserController::class);
 
-        // Applications are created by the public form only, so admins
-        // can list, view, update status, and delete them.
-        Route::apiResource('applications', AdminJobApplicationController::class)
-            ->except(['store']);
+        Route::apiResource('applications', AdminJobApplicationController::class);
     });

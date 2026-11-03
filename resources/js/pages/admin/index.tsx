@@ -83,7 +83,6 @@ const resources: ResourceConfig[] = [
     {
         title: 'Applications',
         endpoint: '/api/admin/applications',
-        canCreate: false,
         columns: [
             'id',
             'job_listing_id',
@@ -93,6 +92,11 @@ const resources: ResourceConfig[] = [
             'created_at',
         ],
         fields: [
+            { name: 'job_listing_id', label: 'Job ID', type: 'number' },
+            { name: 'name', label: 'Name' },
+            { name: 'email', label: 'Email', type: 'email' },
+            { name: 'tel_num', label: 'Phone' },
+            { name: 'message', label: 'Message', type: 'textarea' },
             {
                 name: 'status',
                 label: 'Status (new, reviewed, rejected, hired)',

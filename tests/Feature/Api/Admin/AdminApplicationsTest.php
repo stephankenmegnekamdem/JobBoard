@@ -23,16 +23,30 @@ test('admins can list applications with pagination', function () {
         ->assertJsonPath('meta.total', 20);
 });
 
-test('applications cannot be created through the admin api', function () {
-    $this->actingAs($this->admin)
-        ->postJson('/api/admin/applications', [
-            'job_listing_id' => JobListing::factory()->create()->id,
-            'name' => 'Ada Lovelace',
-            'email' => 'ada@example.com',
-            'message' => 'Hello',
-            'status' => 'new',
-        ])
-        ->assertStatus(405);
+test('admins can create an application', function () {
+    $job = JobListing::factory()->create();
+
+    $created = $this->actingAs($this->admin)->postJson('/api/admin/applications', [
+        'job_listing_id' => $job->id,
+        'name' => 'Ada Lovelace',
+        'email' => 'ada@example.com',
+        'message' => 'Hello',
+        'status' => 'reviewed',
+    ])->assertCreated()->json('data.id');
+
+    $this->assertDatabaseHas('job_applications', ['id' => $created, 'status' => 'reviewed']);
+});
+
+test('admins cannot create a duplicate application for the same email and job', function () {
+    $existing = JobApplication::factory()->create();
+
+    $this->actingAs($this->admin)->postJson('/api/admin/applications', [
+        'job_listing_id' => $existing->job_listing_id,
+        'name' => 'Someone',
+        'email' => $existing->email,
+        'message' => 'Again',
+        'status' => 'new',
+    ])->assertUnprocessable()->assertJsonValidationErrors(['email']);
 });
 
 test('admins can update the status of an application', function () {
