@@ -36,7 +36,7 @@ class ApplicationController extends Controller
                 'jobTitle' => $application->jobListing->title,
             ],
             'applicant' => $applicant ? [
-                'name' => trim($applicant->name . ' ' . $applicant->last_name),
+                'name' => trim($applicant->name.' '.$applicant->last_name),
                 'about' => $applicant->about,
                 'address' => $applicant->address,
                 'avatarUrl' => $applicant->avatar_url,
@@ -54,7 +54,7 @@ class ApplicationController extends Controller
 
         abort_if($cv === null || ! Storage::disk('local')->exists($cv), 404);
 
-        return Storage::disk('local')->download($cv, $application->name . ' - CV.pdf');
+        return Storage::disk('local')->download($cv, $application->name.' - CV.pdf');
     }
 
     public function updateStatus(Request $request, string $current_team, JobApplication $application): RedirectResponse
