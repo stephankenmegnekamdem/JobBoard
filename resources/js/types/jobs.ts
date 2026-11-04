@@ -21,7 +21,7 @@ export type JobDetail = Job & {
     link: string | null;
     image: string | null;
     expires_at: string | null;
-    contact: { name: string };
+    contact: { name: string } | null;
 };
 export type Paginated<T> = {
     data: T[];
