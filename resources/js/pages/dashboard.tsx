@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { edit } from '@/routes/teams';
 import type { DashboardInvitation } from '@/types';
+import { statusVariant } from '@/types/jobs';
 
 type RecentApplication = {
     id: number;
@@ -113,16 +114,19 @@ export default function Dashboard({
                                     className="flex items-center justify-between gap-4 p-4"
                                 >
                                     <div className="min-w-0">
-                                        <div className="truncate font-medium">
+                                        <Link
+                                            href={`/${team.slug}/applications/${application.id}`}
+                                            className="truncate font-medium underline-offset-4 hover:underline"
+                                        >
                                             {application.name}
-                                        </div>
+                                        </Link>
                                         <div className="truncate text-sm text-muted-foreground">
                                             {application.jobTitle} ·{' '}
                                             {application.email}
                                         </div>
                                     </div>
                                     <div className="flex shrink-0 items-center gap-3">
-                                        <Badge variant="secondary">
+                                        <Badge variant={statusVariant[application.status] ?? 'secondary'}>
                                             {application.status}
                                         </Badge>
                                         <span className="text-sm text-muted-foreground">

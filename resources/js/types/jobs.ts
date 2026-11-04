@@ -27,3 +27,10 @@ export type Paginated<T> = {
     data: T[];
     meta: { current_page: number; last_page: number; total: number };
 };
+export const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' |
+'outline'> = {
+new: 'default',
+reviewed: 'secondary',
+rejected: 'destructive',
+hired: 'outline',
+};

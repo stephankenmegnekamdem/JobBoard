@@ -41,16 +41,22 @@ export default function ApplyForm({ jobId }: { jobId: number }) {
     }
 
     const fullName = user ? `${user.name} ${user.last_name}`.trim() : '';
+    const prefilled = user !== null;
 
     return (
         <form onSubmit={submit} className="grid gap-3 border-t pt-3">
+            {prefilled && (
+                <p className="text-sm text-muted-foreground">
+                    Prefilled from your profile. Edit anything that's missing or out of date.
+                </p>
+            )}
             <div className="grid gap-1">
                 <Label htmlFor={`name-${jobId}`}>Name</Label>
                 <Input
                     id={`name-${jobId}`}
                     name="name"
                     defaultValue={fullName}
-                    readOnly={!!user}
+
                     required
                 />
                 {errors.name && (
@@ -64,7 +70,7 @@ export default function ApplyForm({ jobId }: { jobId: number }) {
                     name="email"
                     type="email"
                     defaultValue={user?.email ?? ''}
-                    readOnly={!!user}
+
                     required
                 />
                 {errors.email && (
@@ -77,7 +83,7 @@ export default function ApplyForm({ jobId }: { jobId: number }) {
                     id={`tel-${jobId}`}
                     name="tel_num"
                     defaultValue={user?.tel_num ?? ''}
-                    readOnly={!!user}
+
                 />
                 {errors.tel_num && (
                     <p className="text-sm text-red-600">{errors.tel_num[0]}</p>

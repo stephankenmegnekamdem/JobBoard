@@ -37,7 +37,7 @@ class ProfileController extends Controller
 
         if ($request->hasFile('cv')) {
             $validated['cv'] = $request->file('cv')
-                ->store('cvs', 'public');
+                ->store('cvs', 'local');
         } else {
             unset($validated['cv']);
         }
