@@ -26,6 +26,8 @@ type Props = {
         hasCv: boolean;
     } | null;
     statuses: string[];
+    /** Only the company owner and admins may change the status. */
+    canUpdateStatus: boolean;
 };
 
 export default function CompanyApplication({
@@ -33,6 +35,7 @@ export default function CompanyApplication({
     application,
     applicant,
     statuses,
+    canUpdateStatus,
 }: Props) {
     const base = `/${team.slug}/applications/${application.id}`;
 
@@ -89,20 +92,30 @@ export default function CompanyApplication({
                     <aside className="space-y-4">
                         <div className="space-y-2 rounded-lg border p-4">
                             <Label htmlFor="status">Status</Label>
-                            <select
-                                id="status"
-                                defaultValue={application.status}
-                                onChange={(event) =>
-                                    changeStatus(event.target.value)
-                                }
-                                className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
-                            >
-                                {statuses.map((status) => (
-                                    <option key={status} value={status}>
-                                        {status}
-                                    </option>
-                                ))}
-                            </select>
+                            {canUpdateStatus ? (
+                                <select
+                                    id="status"
+                                    defaultValue={application.status}
+                                    onChange={(event) =>
+                                        changeStatus(event.target.value)
+                                    }
+                                    className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+                                >
+                                    {statuses.map((status) => (
+                                        <option key={status} value={status}>
+                                            {status}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <p
+                                    id="status"
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Only the company owner and admins can change
+                                    the status.
+                                </p>
+                            )}
                             <Badge
                                 variant={
                                     statusVariant[application.status] ??

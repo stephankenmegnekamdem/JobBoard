@@ -23,7 +23,9 @@ Route::prefix('{current_team}')
         Route::get('applications/{application}/cv', [CompanyApplicationController::class, 'cv'])
             ->name('company.applications.cv');
 
+        // Only the company owner and its admins may change an application's status.
         Route::patch('applications/{application}/status', [CompanyApplicationController::class, 'updateStatus'])
+            ->middleware(EnsureTeamMembership::class.':admin')
             ->name('company.applications.status');
     });
 

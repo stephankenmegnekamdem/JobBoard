@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\Enums\TeamRole;
 use App\Http\Controllers\Controller;
 use App\Models\JobApplication;
 use App\Models\Team;
@@ -23,6 +24,8 @@ class ApplicationController extends Controller
 
         $applicant = $application->applicant;
 
+        $canUpdateStatus = $request->user()?->teamRole($team)?->isAtLeast(TeamRole::Admin) ?? false;
+
         return Inertia::render('company/application', [
             'team' => ['name' => $team->name, 'slug' => $team->slug],
             'application' => [
@@ -43,6 +46,7 @@ class ApplicationController extends Controller
                 'hasCv' => $applicant->cv !== null,
             ] : null,
             'statuses' => JobApplication::statuses(),
+            'canUpdateStatus' => $canUpdateStatus,
         ]);
     }
 
