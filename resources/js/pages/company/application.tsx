@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { statusVariant } from '@/types/jobs';
+
 type Props = {
     team: { name: string; slug: string };
     application: {
@@ -55,19 +56,28 @@ export default function CompanyApplication({
                         }`}
                     />
                     <Button asChild variant="outline">
-                        <Link href={`/${team.slug}/dashboard`}>Back to dashboard</Link>
+                        <Link href={`/${team.slug}/dashboard`}>
+                            Back to dashboard
+                        </Link>
                     </Button>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
                     <section className="space-y-4 rounded-lg border p-4">
-                        <h2 className="font-medium">Message from the applicant</h2>
-                        <p className="text-sm whitespace-pre-line">{application.message}</p>
+                        <h2 className="font-medium">
+                            Message from the applicant
+                        </h2>
+                        <p className="text-sm whitespace-pre-line">
+                            {application.message}
+                        </p>
 
                         <dl className="grid grid-cols-[8rem_1fr] gap-y-1 text-sm">
                             <dt className="text-muted-foreground">Email</dt>
                             <dd>
-                                <a href={`mailto:${application.email}`} className="underline">
+                                <a
+                                    href={`mailto:${application.email}`}
+                                    className="underline"
+                                >
                                     {application.email}
                                 </a>
                             </dd>
@@ -82,7 +92,9 @@ export default function CompanyApplication({
                             <select
                                 id="status"
                                 defaultValue={application.status}
-                                onChange={(event) => changeStatus(event.target.value)}
+                                onChange={(event) =>
+                                    changeStatus(event.target.value)
+                                }
                                 className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
                             >
                                 {statuses.map((status) => (
@@ -91,7 +103,14 @@ export default function CompanyApplication({
                                     </option>
                                 ))}
                             </select>
-                            <Badge variant={statusVariant[application.status] ?? 'secondary'}>{application.status}</Badge>
+                            <Badge
+                                variant={
+                                    statusVariant[application.status] ??
+                                    'secondary'
+                                }
+                            >
+                                {application.status}
+                            </Badge>
                         </div>
 
                         <div className="space-y-3 rounded-lg border p-4">
@@ -101,12 +120,19 @@ export default function CompanyApplication({
                                     <div className="flex items-center gap-3">
                                         <Avatar className="size-12">
                                             {applicant.avatarUrl && (
-                                                <AvatarImage src={applicant.avatarUrl} alt={applicant.name} />
+                                                <AvatarImage
+                                                    src={applicant.avatarUrl}
+                                                    alt={applicant.name}
+                                                />
                                             )}
-                                            <AvatarFallback>{applicant.name.charAt(0)}</AvatarFallback>
+                                            <AvatarFallback>
+                                                {applicant.name.charAt(0)}
+                                            </AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <div className="font-medium">{applicant.name}</div>
+                                            <div className="font-medium">
+                                                {applicant.name}
+                                            </div>
                                             {applicant.address && (
                                                 <div className="text-sm text-muted-foreground">
                                                     {applicant.address}
@@ -116,15 +142,21 @@ export default function CompanyApplication({
                                     </div>
 
                                     {applicant.about && (
-                                        <p className="text-sm whitespace-pre-line">{applicant.about}</p>
+                                        <p className="text-sm whitespace-pre-line">
+                                            {applicant.about}
+                                        </p>
                                     )}
 
                                     {applicant.hasCv ? (
                                         <Button asChild size="sm">
-                                            <a href={`${base}/cv`}>Download CV</a>
+                                            <a href={`${base}/cv`}>
+                                                Download CV
+                                            </a>
                                         </Button>
                                     ) : (
-                                        <p className="text-sm text-muted-foreground">No CV uploaded.</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            No CV uploaded.
+                                        </p>
                                     )}
                                 </>
                             ) : (
@@ -140,7 +172,10 @@ export default function CompanyApplication({
     );
 }
 
-CompanyApplication.layout = (props: { homeUrl: string; application: { name: string } }) => ({
+CompanyApplication.layout = (props: {
+    homeUrl: string;
+    application: { name: string };
+}) => ({
     breadcrumbs: [
         { title: 'Dashboard', href: props.homeUrl },
         { title: props.application.name, href: '#' },

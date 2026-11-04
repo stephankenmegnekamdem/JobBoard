@@ -24,7 +24,9 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                                 <span className="text-sm">{user.name}</span>
                                 {user.account_type === 'seeker' && (
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href="/applications">My applications</Link>
+                                        <Link href="/applications">
+                                            My applications
+                                        </Link>
                                     </Button>
                                 )}
                                 <Button asChild variant="outline" size="sm">

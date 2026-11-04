@@ -98,13 +98,18 @@ export default function Dashboard({
                     </h2>
 
                     {recentApplications.length === 0 ? (
-                        <p
+                        <div
                             data-test="no-applications"
-                            className="rounded-lg border py-8 text-center text-muted-foreground"
+                            className="space-y-2 rounded-lg border py-8 text-center"
                         >
-                            No applications yet. They will appear here when
-                            candidates apply to your listings.
-                        </p>
+                            <p className="text-muted-foreground">
+                                No applications yet. They will appear here when
+                                candidates apply to your listings.
+                            </p>
+                            <Button asChild variant="outline" size="sm">
+                                <Link href="/">View the job board</Link>
+                            </Button>
+                        </div>
                     ) : (
                         <div className="divide-y rounded-lg border">
                             {recentApplications.map((application) => (
@@ -126,7 +131,13 @@ export default function Dashboard({
                                         </div>
                                     </div>
                                     <div className="flex shrink-0 items-center gap-3">
-                                        <Badge variant={statusVariant[application.status] ?? 'secondary'}>
+                                        <Badge
+                                            variant={
+                                                statusVariant[
+                                                    application.status
+                                                ] ?? 'secondary'
+                                            }
+                                        >
                                             {application.status}
                                         </Badge>
                                         <span className="text-sm text-muted-foreground">

@@ -47,7 +47,8 @@ export default function ApplyForm({ jobId }: { jobId: number }) {
         <form onSubmit={submit} className="grid gap-3 border-t pt-3">
             {prefilled && (
                 <p className="text-sm text-muted-foreground">
-                    Prefilled from your profile. Edit anything that's missing or out of date.
+                    Prefilled from your profile. Edit anything that's missing or
+                    out of date.
                 </p>
             )}
             <div className="grid gap-1">
@@ -83,7 +84,6 @@ export default function ApplyForm({ jobId }: { jobId: number }) {
                     id={`tel-${jobId}`}
                     name="tel_num"
                     defaultValue={user?.tel_num ?? ''}
-
                 />
                 {errors.tel_num && (
                     <p className="text-sm text-red-600">{errors.tel_num[0]}</p>

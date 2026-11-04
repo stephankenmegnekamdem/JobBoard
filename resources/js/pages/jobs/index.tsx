@@ -26,10 +26,12 @@ export default function JobsIndex() {
         <>
             <Head title="Jobs" />
             <div className="mb-8 space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">Find your next role</h1>
+                <h1 className="text-3xl font-bold tracking-tight">
+                    Find your next role
+                </h1>
                 <p className="max-w-prose text-muted-foreground">
-                    Open positions from companies on JobBoard. Learn more about any listing,
-                    then apply in a minute: no account needed.
+                    Open positions from companies on JobBoard. Learn more about
+                    any listing, then apply in a minute: no account needed.
                 </p>
             </div>
             <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
