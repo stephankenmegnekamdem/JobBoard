@@ -82,6 +82,9 @@ export default function DataTable({ config }: { config: ResourceConfig }) {
     }
 
     async function remove(row: Row) {
+        if (!window.confirm('Delete this record? This cannot be undone.')) {
+            return;
+        }
         await apiFetch(`${config.endpoint}/${row.id}`, { method: 'DELETE' });
         await load();
     }

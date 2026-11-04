@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiFetch } from '@/lib/api';
 import type { Job, Paginated } from '@/types/jobs';
+
 export default function JobsIndex() {
     const [page, setPage] = useState(1);
     const [query, setQuery] = useState('');
@@ -20,11 +21,20 @@ export default function JobsIndex() {
             .then((res) => res.json())
             .then((data: Paginated<Job>) => setResult(data));
     }, [page, query]);
+
     return (
         <>
             <Head title="Jobs" />
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-2xl font-bold">Open positions</h1>
+            <div className="mb-8 space-y-2">
+                <h1 className="text-3xl font-bold tracking-tight">
+                    Find your next role
+                </h1>
+                <p className="max-w-prose text-muted-foreground">
+                    Open positions from companies on JobBoard. Learn more about
+                    any listing, then apply in a minute: no account needed.
+                </p>
+            </div>
+            <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
                 <Input
                     id="search"
                     placeholder="Search title or keywords"

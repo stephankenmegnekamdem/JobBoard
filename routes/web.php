@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\ApplicationsController;
+use App\Http\Controllers\Company\ApplicationController as CompanyApplicationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
@@ -15,17 +16,33 @@ Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
     ->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+        Route::get('applications/{application}', [CompanyApplicationController::class, 'show'])
+            ->name('company.applications.show');
+
+        Route::get('applications/{application}/cv', [CompanyApplicationController::class, 'cv'])
+            ->name('company.applications.cv');
+
+        Route::patch('applications/{application}/status', [CompanyApplicationController::class, 'updateStatus'])
+            ->name('company.applications.status');
     });
 
-Route::middleware(['auth', 'verified'])->get('applications', ApplicationsController::class)->name('applications');
+Route::middleware(['auth', 'verified'])
+    ->get('applications', ApplicationsController::class)
+    ->name('applications');
 
-Route::middleware(['auth', 'verified'])->get('account/home', function (Request $request) {
-    return redirect(HomeRoute::for($request->user()));
-})->name('account.home');
+Route::middleware(['auth', 'verified'])
+    ->get('account/home', function (Request $request) {
+        return redirect(HomeRoute::for($request->user()));
+    })
+    ->name('account.home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
-    Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
+    Route::post('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])
+        ->name('invitations.accept');
+
+    Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])
+        ->name('invitations.decline');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {

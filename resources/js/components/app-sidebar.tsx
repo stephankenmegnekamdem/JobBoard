@@ -1,11 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import {
-    BookOpen,
-    Briefcase,
-    FolderGit2,
-    LayoutGrid,
-    Shield,
-} from 'lucide-react';
+import { Briefcase, FolderGit2, LayoutGrid, Shield } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -25,32 +19,21 @@ import type { NavItem } from '@/types';
 export function AppSidebar() {
     const { homeUrl, auth } = usePage().props;
 
-    const mainNavItems: NavItem[] = [
-        {
-            title: 'Dashboard',
-            href: homeUrl,
-            icon: LayoutGrid,
-        },
-        {
-            title: 'Job board',
-            href: '/',
-            icon: Briefcase,
-        },
-        ...(auth.user.is_admin
-            ? [{ title: 'Admin', href: '/admin', icon: Shield }]
-            : []),
-    ];
+    const mainNavItems: NavItem[] = auth.user.is_admin
+        ? [
+              { title: 'Admin', href: '/admin', icon: Shield },
+              { title: 'Job board', href: '/', icon: Briefcase },
+          ]
+        : [
+              { title: 'Dashboard', href: homeUrl, icon: LayoutGrid },
+              { title: 'Job board', href: '/', icon: Briefcase },
+          ];
 
     const footerNavItems: NavItem[] = [
         {
-            title: 'Repository',
-            href: 'https://github.com/laravel/react-starter-kit',
+            title: 'Source code',
+            href: 'https://github.com/stephankenmegnekamdem/JobBoard',
             icon: FolderGit2,
-        },
-        {
-            title: 'Documentation',
-            href: 'https://laravel.com/docs/starter-kits#react',
-            icon: BookOpen,
         },
     ];
 

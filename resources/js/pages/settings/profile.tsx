@@ -3,12 +3,13 @@ import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileCo
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
-import type { Auth } from '@/types';
 import { send } from '@/routes/verification';
+import type { Auth } from '@/types';
 
 type PageProps = {
     auth: Auth;
@@ -22,6 +23,7 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage<PageProps>().props;
+    const isSeeker = auth.user.account_type === 'seeker';
 
     return (
         <>
@@ -135,47 +137,68 @@ export default function Profile({
                                 <InputError message={errors.address} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="about">About me</Label>
+                            {isSeeker && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="about">About me</Label>
 
-                                <textarea
-                                    id="about"
-                                    name="about"
-                                    defaultValue={auth.user.about ?? ''}
-                                    maxLength={2000}
-                                    rows={4}
-                                    className="rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
-                                    placeholder="Tell us about yourself..."
-                                />
+                                    <textarea
+                                        id="about"
+                                        name="about"
+                                        defaultValue={auth.user.about ?? ''}
+                                        maxLength={2000}
+                                        rows={4}
+                                        className="rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
+                                        placeholder="Tell us about yourself..."
+                                    />
 
-                                <InputError message={errors.about} />
-                            </div>
+                                    <InputError message={errors.about} />
+                                </div>
+                            )}
 
                             <div className="grid gap-2">
                                 <Label htmlFor="image">Profile image</Label>
-
-                                <Input
-                                    id="image"
-                                    type="file"
-                                    name="image"
-                                    accept="image/jpeg,image/png,image/webp"
-                                />
-
+                                <div className="flex items-center gap-4">
+                                    <Avatar className="size-16">
+                                        {auth.user.avatar_url && (
+                                            <AvatarImage
+                                                src={auth.user.avatar_url}
+                                                alt={auth.user.name}
+                                            />
+                                        )}
+                                        <AvatarFallback>
+                                            {auth.user.name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <Input
+                                        id="image"
+                                        type="file"
+                                        name="image"
+                                        accept="image/jpeg,image/png,image/webp"
+                                    />
+                                </div>
                                 <InputError message={errors.image} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="cv">CV (PDF)</Label>
+                            {isSeeker && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="cv">CV (PDF)</Label>
 
-                                <Input
-                                    id="cv"
-                                    type="file"
-                                    name="cv"
-                                    accept="application/pdf,.pdf"
-                                />
+                                    <Input
+                                        id="cv"
+                                        type="file"
+                                        name="cv"
+                                        accept="application/pdf,.pdf"
+                                    />
+                                    {auth.user.cv && (
+                                        <p className="text-sm text-muted-foreground">
+                                            A CV is on file. Upload a new one to
+                                            replace it.
+                                        </p>
+                                    )}
 
-                                <InputError message={errors.cv} />
-                            </div>
+                                    <InputError message={errors.cv} />
+                                </div>
+                            )}
 
                             {mustVerifyEmail &&
                                 auth.user.email_verified_at === null && (
